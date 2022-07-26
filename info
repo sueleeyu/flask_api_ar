@@ -1,0 +1,61 @@
+# 打开anaconda prompt 执行 pip install -i https://pypi.tuna.tsinghua.edu.cn/simple xxx
+#########################pip install -i https://pypi.tuna.tsinghua.edu.cn/simple flask-migrate==2.5.2
+#########################pip install -i https://pypi.tuna.tsinghua.edu.cn/simple alembic==1.8.1
+#项目开发中通长需要加载很多软件包，直接操作很麻烦
+#我们可以利用pip生成一个软件包列表文档
+#在新的项目环境中直接调用该文档进行依赖安装
+#在配置好框架下的项目我们可以在命令窗口执行pip freeze > requirements.txt 生成requirements.txt文件
+
+#1. 锚点信息表：
+CREATE TABLE geoanchor_history (
+id         	bigint unsigned primary key not null auto_increment ,#自增主键
+bid   	    varchar(20) default '' COMMENT '合作方id 100001：TOM，100002：邮乐',  #合作方id 100001：TOM，100002：邮乐
+name   	    varchar(20) default '' COMMENT '锚点名称',#锚点名称
+serializedTime varchar(30) default '' COMMENT '客户端锚点设置时间',#
+latitude   	    float default 0.0 COMMENT '纬度',#
+longitude   	float default 0.0 COMMENT '锚点经度',#
+altitude   	    float default 0.0 COMMENT '锚点海拔',#
+heading   	    float default 0.0 COMMENT '锚点朝向',#
+state tinyint unsigned  default 0 COMMENT '//0未审核,1审核通过，2不通过',#状态
+create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+update_time timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+index(bid,name)
+) DEFAULT CHARSET=utf8mb4;
+
+###########################################################################
+# 原生sql语句操作
+sql = 'select * from user'
+result = db.session.execute(sql)
+
+# 查询全部
+User.query.all()
+# 主键查询
+User.query.get(1)
+# 条件查询
+User.query.filter_by(User.username='name')
+# 多条件查询
+from sqlalchemy import and_
+User.query.filter_by(and_(User.username =='name',User.password=='passwd'))
+# 比较查询
+User.query.filter(User.id.__lt__(5)) # 小于5
+User.query.filter(User.id.__le__(5)) # 小于等于5
+User.query.filter(User.id.__gt__(5)) # 大于5
+User.query.filter(User.id.__ge__(5)) # 大于等于5
+# in查询
+User.query.filter(User.username.in_('A','B','C','D'))
+# 排序
+User.query.order_by('age') # 按年龄排序，默认升序，在前面加-号为降序'-age'
+# 限制查询
+User.query.filter(age=18).offset(2).limit(3)  # 跳过二条开始查询，限制输出3条
+
+# 增加
+use = User(id,username,password)
+db.session.add(use)
+db.session.commit()
+
+# 删除
+User.query.filter_by(User.username='name').delete()
+
+# 修改
+User.query.filter_by(User.username='name').update({'password':'newdata'})
+##############################################################################
